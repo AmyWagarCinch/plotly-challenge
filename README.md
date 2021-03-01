@@ -24,8 +24,8 @@ Step 1: Plotly
 
 4. I displayed the sample metadata, i.e., an individual's demographic information.
 
-
 5. I displayed each key-value pair from the metadata JSON object on the page.
-6. The plots are updated any time that a new sample is selected.
+
+6. The plots are updated any time a new sample is selected.
 
 
