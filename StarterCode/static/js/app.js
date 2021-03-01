@@ -1,11 +1,13 @@
 // Fetch the JSON data and console log it
 d3.json("samples.json").then(function(data) {
+ console.log(data)
+ var samples = data.samples[0]
     var trace1 = {
-        x: data.otu_ids,
-        y: data.sample_values,
+        x: samples.otu_ids,
+        y: samples.sample_values,
         type: "bar",
         orientation: 'h',
-        text: data.otu_labels
+        text: samples.otu_labels
       };
       
       var data = [trace1];
@@ -23,20 +25,3 @@ d3.json("samples.json").then(function(data) {
   //const dataPromise = d3.json(url);
   //console.log("Data Promise: ", dataPromise);
 
-// var trace1 = {
-//     x: otu_ids,
-//     y: sample_values,
-//     type: "bar",
-//     orientation: 'h',
-//     text: otu_labels
-//   };
-  
-//   var data = [trace1];
-  
-//   var layout = {
-//     title: "Gross Chart",
-//     xaxis: { title: "Title" },
-//     yaxis: { title: "Metascore (Critic) Rating"}
-//   };
-  
-//   Plotly.newPlot("bar", data, layout);
