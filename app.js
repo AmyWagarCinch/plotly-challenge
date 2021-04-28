@@ -2,7 +2,7 @@ function MetaDataBuild(sample) {
     d3.json("samples.json").then((data) => {
       var metadata = data.metadata;
       
-      var results = metadata.filter(sampleObj => sampleObj.id == sample);
+      var results = metadata.filter(sampleObject => sampleObject.id == sample);
       var result = results[0];
       
       var panel = d3.select("#sample-metadata");
