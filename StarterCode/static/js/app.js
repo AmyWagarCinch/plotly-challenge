@@ -1,53 +1,107 @@
-// Fetch the JSON data and console log it
-d3.json("samples.json").then(function(data) {
- console.log(data)
- var samples = data.samples
-
- var tempID = updatePlotly();
- selectedIDs = samples.filter(selectedD => selectedD.id === tempID);
- console.log(selectedIDs)
-
-    var trace1 = {
-        x: selectedIDs[0].otu_ids.slice(0,11).reverse(),
-        y: selectedIDs[0].sample_values.slice(0,11).reverse(),
-        type: "bar",
-        orientation: 'h',
-        text: samples.otu_labels
-      };
+function MetaDataBuild(sample) {
+    d3.json("samples.json").then((data) => {
+      var metadata = data.metadata;
       
-      var data = [trace1];
+      var results = metadata.filter(sampleObj => sampleObj.id == sample);
+      var result = results[0];
       
-      var layout = {
-        title: "Gross Chart",
-        xaxis: { title: "Title" },
-        yaxis: { title: "blah blah blah"}
-      };
-      
-      Plotly.newPlot("bar", data, layout); 
-  });
+      var panel = d3.select("#sample-metadata");
   
-
-  // Call updatePlotly() when a change takes place to the DOM
-d3.selectAll("#selDataset").on("change", updatePlotly);
-
-// This function is called when a dropdown menu item is selected
-function updatePlotly() {
-  // Use D3 to select the dropdown menu
-  var dropdownMenu = d3.select("#selDataset");
-
-  d3.json("samples.json").then(function(data) {
-    var sampleNames = data.names
-
-    sampleNames.forEach((sample) => { dropdownMenu.append("option")
-    .text(sample)
-    .property("value", sample); 
-   
+      //Clears existing metadata
+      panel.html("");
+  
+        //Key-Value Pairs
+      Object.entries(result).forEach(([key, value]) => {
+        panel.append("h6").text(`${key.toUpperCase()}: ${value}`);
+      });
+  
+      
     });
+  }
   
-    //var selectedDate = d3.select("#datetime").node().value;
-    return dropdownMenu.value
- 
-}
-
-init();
-
+  function ChartBuild(sample) {
+    d3.json("samples.json").then((data) => {
+      var samples = data.samples;
+      var results = samples.filter(sampleObject => sampleObject.id == sample);
+      var result = results[0];
+  
+      var otu_ids = result.otu_ids;
+      var otu_labels = result.otu_labels;
+      var sample_values = result.sample_values;
+  
+      //Bubble Chart
+      var layout1 = {
+        title: "Bacteria Cultures Per Sample",
+        margin: { t: 0 },
+        hovermode: "closest",
+        xaxis: { title: "OTU ID" },
+        margin: { t: 30}
+      };
+      var data1 = [
+        {
+          x: otu_ids,
+          y: sample_values,
+          text: otu_labels,
+          mode: "markers",
+          marker: {
+            size: sample_values,
+            color: otu_ids,
+            colorscale: "Earth"
+          }
+        }
+      ];
+  
+      Plotly.newPlot("bubble", data1, layout1);
+  
+      //Bar Chart
+      var yticks = otu_ids.slice(0, 10).map(otuID => `OTU ${otuID}`).reverse();
+      var data2 = [
+        {
+          y: yticks,
+          x: sample_values.slice(0, 10).reverse(),
+          text: otu_labels.slice(0, 10).reverse(),
+          type: "bar",
+          orientation: "h",
+        }
+      ];
+  
+      var layout2 = {
+        title: "Top 10 Bacteria Cultures Found",
+        margin: { t: 30, l: 150 }
+      };
+  
+      Plotly.newPlot("bar", data2, layout2);
+    });
+  }
+  
+  //init function
+  function init() {
+    
+    var selector = d3.select("#selDataset");
+  
+    
+    d3.json("samples.json").then((data) => {
+      var sampleNames = data.names;
+  
+      sampleNames.forEach((sample) => {
+        selector
+          .append("option")
+          .text(sample)
+          .property("value", sample);
+      });
+  
+      
+      var sample1 = sampleNames[0];
+      ChartBuild(sample1);
+      MetaDataBuild(sample1);
+    });
+  }
+  
+  function optionChanged(newSample) {
+    
+    ChartBuild(newSample);
+    MetaDataBuild(newSample);
+  }
+  
+  
+  init();
